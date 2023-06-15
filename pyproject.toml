@@ -1,0 +1,35 @@
+[project]
+name = "arch-github-package"
+version = "0.0.3"
+description = "Convert GitHub project releases to Archlinux package, with autoupdate."
+readme = "README.md"
+requires-python = ">=3.7"
+authors = [
+  { name="Jin Liu", email="m.liu.jin@gmail.com" },
+]
+keywords = ["arch", "archlinux", "AUR", "github", "package", "package-manager"]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Environment :: Console",
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: POSIX :: Linux",
+    "Topic :: System"
+]
+dependencies = [
+  "typer==0.9.*",
+  "PyGithub==1.58.*",
+  "tabulate==0.9.*",
+  "filetype==1.2.*",
+]
+
+[project.urls]
+"Repository" = "https://github.com/jinliu/arch-github-package"
+"Bug Tracker" = "https://github.com/jinliu/arch-github-package/issues"
+
+[project.scripts]
+agp = "arch_github_package.main:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
