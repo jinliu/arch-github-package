@@ -33,7 +33,7 @@ class Releases:
 
     def get_publish_date(self):
         r = self.releases[0]
-        return r.published_at.strftime("%Y%m%d")
+        return r.published_at.strftime("%Y-%m-%d")
     
     def download_tarball(self, save_dir):
         assets = self.releases[0].assets
