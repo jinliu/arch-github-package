@@ -9,8 +9,8 @@ class Package:
     def load(state_dir, package_name):
         config = configparser.ConfigParser()
         config.read(Path(state_dir)/package_name)
-        c = config['DEFAULT']
-        return Package(package_name, c['repo'], c['version'], c['publish_date'])
+        c = config["DEFAULT"]
+        return Package(package_name, c["repo"], c["version"], c["publish_date"])
         
     def __init__(self, package_name, repo, version, publish_date):
         self.package_name = package_name
@@ -20,17 +20,17 @@ class Package:
 
     def save(self, state_dir):
         config = configparser.ConfigParser()
-        c = config['DEFAULT']
-        c['repo'] = self.repo
-        c['version'] = self.version
-        c['publish_date'] = self.publish_date
-        with open(state_dir/self.package_name, 'w') as f:
+        c = config["DEFAULT"]
+        c["repo"] = self.repo
+        c["version"] = self.version
+        c["publish_date"] = self.publish_date
+        with open(state_dir/self.package_name, "w") as f:
             config.write(f)
 
 
 class State:
     def __init__(self):
-        self.state_dir = Path.home()/'.local/share/arch-github-package'
+        self.state_dir = Path.home()/".local/share/arch-github-package"
         self.state_dir.mkdir(parents=True, exist_ok=True)
 
     def __enter__(self):

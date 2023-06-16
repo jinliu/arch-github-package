@@ -1,6 +1,6 @@
 from .gh import Releases
 from .pm import Pkgbuild
-from .state import State, Package
+from .state import State
 
 from typing import Optional, Annotated
 import typer
@@ -12,11 +12,8 @@ app = typer.Typer()
 
 
 def install_or_upgrade(releases: Releases, pkgbuild: Pkgbuild):
-    print('Downloading tarball...')
     tarball_name = releases.download_tarball(pkgbuild.get_build_dir())
-
-    print('Installing...')
-    pkgbuild.create_pkgbuild(tarball_name, 'SKIP')
+    pkgbuild.create_pkgbuild(tarball_name, "SKIP")
     pkgbuild.build_and_install()
     pkgbuild.cleanup()
 
@@ -32,10 +29,11 @@ def list():
 @app.command()
 def install(repo: str):
     with State() as state:
+        print(f"Fetching releases from {repo}...")
         releases = Releases(repo)
         pkgbuild = Pkgbuild(releases.get_repo_name(), releases.get_project_name(), releases.get_project_description(), releases.get_latest_version())
 
-        print(f'Installing {repo} {releases.get_latest_version()} as {pkgbuild.get_pkgname()}')
+        print(f"Installing {repo} {releases.get_latest_version()} as {pkgbuild.get_pkgname()}\n")
         install_or_upgrade(releases, pkgbuild)
 
         state.new_package(pkgbuild.get_pkgname(), repo, releases.get_latest_version(), releases.get_publish_date())
@@ -70,14 +68,13 @@ def upgrade(package: Annotated[Optional[str], typer.Argument()] = None):
             print("\nNo updates available")
             return
         
-        if not typer.confirm(f"\nUpgrade {num_updates} packages?", default=True):
-            return
-
+        typer.confirm(f"\nUpgrade {num_updates} packages?", default=True, abort=True)
+            
         for pkg, releases in packages:
             if releases is None:
                 continue
             
-            print(f'Upgrading {pkg.package_name} from {pkg.version} to {releases.get_latest_version()}')
+            print(f"Upgrading {pkg.package_name} from {pkg.version} to {releases.get_latest_version()}")
             pkgbuild = Pkgbuild(releases.get_repo_name(), releases.get_project_name(), releases.get_project_description(), releases.get_latest_version())
             install_or_upgrade(releases, pkgbuild)
             state.update_package(pkg.package_name, releases.get_latest_version(), releases.get_publish_date())
@@ -87,7 +84,7 @@ def upgrade(package: Annotated[Optional[str], typer.Argument()] = None):
 def uninstall(package: str):
     with State() as state:
         p = state.get_package(package)
-        ret = subprocess.call(['sudo', 'pacman', '-R', package])
+        ret = subprocess.call(["sudo", "pacman", "-R", package])
         if ret != 0:
             raise Exception("Failed to uninstall package")
         state.remove_package(package)
