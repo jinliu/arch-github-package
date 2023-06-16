@@ -1,6 +1,6 @@
 [project]
 name = "arch-github-package"
-version = "0.0.4"
+version = "0.0.5"
 description = "Convert GitHub project releases to Archlinux package, with autoupdate."
 readme = "README.md"
 requires-python = ">=3.7"
