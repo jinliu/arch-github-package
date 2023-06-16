@@ -1,13 +1,13 @@
-import typer
-from pathlib import Path
-import tempfile
-import tarfile
-import zipfile
 import gzip
-import shutil
-import subprocess
 import re
 import shutil
+import subprocess
+import tarfile
+import tempfile
+import zipfile
+from pathlib import Path
+
+import typer
 
 
 class Pkgbuild:

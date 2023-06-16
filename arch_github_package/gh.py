@@ -1,7 +1,8 @@
-from github import Github
 import urllib.request
 from pathlib import Path
+
 import typer
+from github import Github
 
 _github = Github()
 

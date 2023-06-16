@@ -1,7 +1,7 @@
-from pathlib import Path
+import configparser
 import fcntl
 import os
-import configparser
+from pathlib import Path
 
 
 class Package:

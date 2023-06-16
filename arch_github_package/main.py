@@ -1,12 +1,12 @@
+import subprocess
+from typing import Annotated, Optional
+
+import typer
+from tabulate import tabulate
+
 from .gh import Releases
 from .pm import Pkgbuild
 from .state import State
-
-from typing import Optional, Annotated
-import typer
-from tabulate import tabulate
-import subprocess
-
 
 app = typer.Typer()
 
