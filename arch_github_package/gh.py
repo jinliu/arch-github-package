@@ -13,7 +13,7 @@ class Releases:
         self.repo = _github.get_repo(repo)
         self.releases = self.repo.get_releases()
         if self.releases.totalCount == 0:
-            raise Exception("No releases found")
+            raise ValueError("No releases found")
 
     def get_repo_name(self):
         return self.repo_name
@@ -56,8 +56,7 @@ class Releases:
         asset_scoretable.sort(key=lambda x: x[1], reverse=True)
 
         if len(asset_scoretable) == 0:
-            print("No tarballs found")
-            typer.Abort()
+            raise ValueError("No tarballs found")
 
         print(f"Found {len(asset_scoretable)} tarballs:\n")
         for i, (asset, score) in enumerate(asset_scoretable):
@@ -68,13 +67,5 @@ class Releases:
             def report(blocknum, blocksize, totalsize):
                 progress.update(blocknum * blocksize - progress.pos)
             urllib.request.urlretrieve(asset.browser_download_url, Path(save_dir)/asset.name, reporthook=report)
+        
         return asset.name
-
-
-if __name__ == "__main__":
-    r = Releases("zix99/rare")
-    print(r.get_project_name())
-    print(r.get_project_description())
-    print(r.get_latest_version())
-    print(r.get_publish_date())
-    print(r.download_tarball("/tmp"))

@@ -109,12 +109,3 @@ package() {{
 
     def cleanup(self):
         shutil.rmtree(self.get_build_dir())
-
-
-if __name__ == "__main__":
-    import gh
-    r = gh.Releases("zix99/rare")
-    p = Pkgbuild(r.get_repo_name(), r.get_project_name(), r.get_project_description(), r.get_latest_version())
-    tarball_name = r.download_tarball(p.get_build_dir())
-    p.create_pkgbuild(tarball_name, "SKIP")
-    print(p.get_build_dir())

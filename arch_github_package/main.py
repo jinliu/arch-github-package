@@ -1,6 +1,7 @@
 import subprocess
 from typing import Annotated, Optional
 
+import github
 import typer
 from tabulate import tabulate
 
@@ -29,10 +30,23 @@ def list():
 @app.command()
 def install(repo: str):
     with State() as state:
-        print(f"Fetching releases from {repo}...")
-        releases = Releases(repo)
-        pkgbuild = Pkgbuild(releases.get_repo_name(), releases.get_project_name(), releases.get_project_description(), releases.get_latest_version())
+        try:
+            pkg = state.get_package(repo)
+            typer.confirm(f"Repo {repo} already installed as {pkg.package_name}, reinstall?", default=True, abort=True)
+        except ValueError:
+            pass
 
+        print(f"Fetching releases from {repo}...")
+        try:
+            releases = Releases(repo)
+        except github.UnknownObjectException:
+            print(f"Repo {repo} not found.")
+            raise typer.Exit(1)
+        except ValueError as e:
+            print(e)
+            raise typer.Exit(1)
+
+        pkgbuild = Pkgbuild(releases.get_repo_name(), releases.get_project_name(), releases.get_project_description(), releases.get_latest_version())
         print(f"Installing {repo} {releases.get_latest_version()} as {pkgbuild.get_pkgname()}\n")
         install_or_upgrade(releases, pkgbuild)
 
@@ -45,7 +59,11 @@ def upgrade(package: Annotated[Optional[str], typer.Argument()] = None):
         if package is None:
             packages = [[pkg,None] for pkg in state.list_packages()]
         else:
-            packages = [[state.get_package(package), None]]
+            try:
+                packages = [[state.get_package(package), None]]
+            except ValueError as e:
+                print(e)
+                raise typer.Exit(1)
 
         print("Checking for updates...\n")
         
@@ -69,7 +87,7 @@ def upgrade(package: Annotated[Optional[str], typer.Argument()] = None):
             return
         
         typer.confirm(f"\nUpgrade {num_updates} packages?", default=True, abort=True)
-            
+        
         for pkg, releases in packages:
             if releases is None:
                 continue
@@ -77,17 +95,28 @@ def upgrade(package: Annotated[Optional[str], typer.Argument()] = None):
             print(f"Upgrading {pkg.package_name} from {pkg.version} to {releases.get_latest_version()}")
             pkgbuild = Pkgbuild(releases.get_repo_name(), releases.get_project_name(), releases.get_project_description(), releases.get_latest_version())
             install_or_upgrade(releases, pkgbuild)
+            
             state.update_package(pkg.package_name, releases.get_latest_version(), releases.get_publish_date())
 
 
 @app.command()
-def uninstall(package: str):
+def uninstall(package: str,
+              force: Annotated[bool, typer.Option(help="delete package metadata even if pacman -R fails")] = False):
     with State() as state:
-        p = state.get_package(package)
-        ret = subprocess.call(["sudo", "pacman", "-R", package])
+        try:
+            pkg = state.get_package(package)
+        except ValueError as e:
+            print(e)
+            raise typer.Exit(1)
+        
+        ret = subprocess.call(["sudo", "pacman", "-R", pkg.package_name])
         if ret != 0:
-            raise Exception("Failed to uninstall package")
-        state.remove_package(package)
+            if force:
+                print("pacman -R failed, but continuing anyway")
+            else:
+                print("Failed to uninstall package")
+                raise typer.Exit(1)
+        pkg.remove()
 
 
 if __name__ == "__main__":
