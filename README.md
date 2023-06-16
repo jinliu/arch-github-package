@@ -23,8 +23,10 @@ pipx installs the package in a virtualenv, so it doesn't pollute your system.
 You can also use pip:
 
 ```bash
-pip install --user arch-github-package
+pip install --user --break-system-packages arch-github-package
 ```
+
+(This will install the package in your user site-packages, not really breaking system packages.)
 
 ## Usage
 
@@ -52,7 +54,8 @@ How does it work:
    file goes where. E.g.:
    * If a file is ELF, or its x modbit is set, it goes to `/usr/bin`.
    * Files like *.1.gz go to `/usr/share/man`.
-   * LICENSE and README.* go to `/usr/share/doc/<package-name>`.
+   * README.* go to `/usr/share/doc/<package-name>`.
+   * LICENSE goes to `/usr/share/licenses/<package-name>`.
 
 1. It creates a PKGBUILD file, and runs `makepkg -si` to build and install it.
    The package name is `<github-project-name>-github`. E.g., `ortesi/devd` becomes
@@ -71,6 +74,9 @@ agp upgrade
 ```
 
 You can also use `agp upgrade <package-name>` to upgrade a single package.
+
+Note: if you run this command repeatively in quick succession, it will hit
+GitHub's rate limit for anonymous API access.
 
 ### Uninstall a package
 
