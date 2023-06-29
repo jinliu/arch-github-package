@@ -38,7 +38,7 @@ class Releases:
     def download_tarball(self, save_dir):
         assets = self.releases[0].assets
         asset_scoretable = []
-        arch = ["linux", "amd64", "x86_64", "x86-64"]
+        arch = ["linux", "amd64", "x86_64", "x86-64", "x64"]
         lib = ["glibc", "gnu"]
         extensions = ["tar", "tgz", "gz", "zip"]
         for asset in assets:
