@@ -14,7 +14,7 @@ class Pkgbuild:
     def __init__(self, repo, project_name, project_description, version):
         self.repo = repo
         self.pkgname = project_name + "-github"
-        self.pkgdesc = project_description
+        self.pkgdesc = project_description.replace("'", "\\'")
         self.pkgver = version
         self.build_dir = Path(tempfile.mkdtemp(prefix="pkgbuild-"+self.pkgname+"-"))
         self.maintainer = "arch-github-package <https://github.com/jinliu/arch-github-package>"
@@ -28,7 +28,7 @@ f"""# Maintainer: {self.maintainer}
 pkgname={self.pkgname}
 pkgver={self.pkgver}
 pkgrel=1
-pkgdesc='{re.escape(self.pkgdesc)}'
+pkgdesc='{self.pkgdesc}'
 arch=('x86_64')
 url="https://github.com/{self.repo}"
 license=('custom')
